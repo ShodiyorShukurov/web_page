@@ -60,7 +60,7 @@ const SMSVerification = () => {
             </Col>
           </Row>
 
-          <Button  type="primary" htmlType="submit" >
+          <Button  type="primary" htmlType="submit" disabled={isButtonDisabled}>
             Verify SMS Code
           </Button>
         </Form>
