@@ -1,24 +1,18 @@
 // src/pages/ConfirmationCode.js
-import  { useState } from "react";
-import { Button, Modal } from "antd"; 
+import { useState } from "react";
+import { Button, Modal, Input } from "antd";
 
 const ConfirmationCode = () => {
   const [confirmationCode, setConfirmationCode] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null); 
-  const [modalVisible, setModalVisible] = useState(false); 
-
+  const [error, setError] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
 
   const handleConfirm = async () => {
-
-    if (!confirmationCode) {
-      setModalVisible(true); // Show the modal if no code is entered
-      return;
-    }
-
     // Check if the confirmation code is not 6 digits
     if (confirmationCode.length !== 6) {
-      setError("Iltimos, 6 raqamli tasdiqlash kodini kiriting!");
+      setModalVisible(true); 
+      setError("Iltimos, 6 raqamli tasdiqlash kodini kiriting!"); // Set error message
       return;
     }
 
@@ -36,7 +30,7 @@ const ConfirmationCode = () => {
 
       if (response.status === 200) {
         console.log("Confirmation Successful:", data);
-      
+        // Navigate to success page or handle success
       } else {
         setError(data.message || "Xatolik yuz berdi!"); // Display error message
       }
@@ -51,20 +45,24 @@ const ConfirmationCode = () => {
   return (
     <div className="container">
       <h1>Tasdiqlash kodini kiriting</h1>
-      <input
-        type="number"
-        maxLength={6} // Ensure the input is at most 6 digits
+      <Input
+        type="text" // Use type="text" to allow custom input validation
         value={confirmationCode}
-        onChange={(e) => setConfirmationCode(e.target.value)}
-        placeholder="000000" // Placeholder for confirmation code
+        onChange={(e) => {
+          // Allow only numeric input and limit to 6 characters
+          const value = e.target.value.replace(/\D/g, ""); // Remove non-digit characters
+          if (value.length <= 6) {
+            setConfirmationCode(value);
+          }
+        }}
+        placeholder="000000"
         style={{
           width: "100%",
           padding: "8px",
           fontSize: "16px",
           marginTop: "20px",
-        }} // Basic styling
+        }}
       />
-      {error && <p className="error-message">{error}</p>}{" "}
       {/* Display error message */}
       <div className="sticky-button">
         <button
@@ -76,23 +74,31 @@ const ConfirmationCode = () => {
           {loading ? <div className="loader"></div> : "Tasdiqlash"}
         </button>
       </div>
-      
       <Modal
         title="Xato"
         open={modalVisible}
-        onOk={() => setModalVisible(false)}
-        onCancel={() => setModalVisible(false)}
+        onOk={() => {
+          setModalVisible(false);
+          setError(null); // Clear the error message when the modal is closed
+        }}
+        onCancel={() => {
+          setModalVisible(false);
+          setError(null); // Clear the error message when the modal is closed
+        }}
         footer={[
           <Button
             key="ok"
             type="primary"
-            onClick={() => setModalVisible(false)}
+            onClick={() => {
+              setModalVisible(false);
+              setError(null); // Clear the error message when the modal is closed
+            }}
           >
-            OK
+            Yopish
           </Button>,
         ]}
       >
-        <p>SMS kodini kiriting!</p>
+        <p>{error}</p> {/* Display the error message in the modal */}
       </Modal>
     </div>
   );

@@ -2,12 +2,14 @@ import React, { useState } from "react";
 import MaskedInput from "react-text-mask";
 import { Modal, Button } from "antd"; 
 import "./ObunaPay.css";
+import { useNavigate } from "react-router-dom";
 
 const ObunaPay = () => {
   const [cardNumber, setCardNumber] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
   const [loading, setLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false); 
+  const navigate = useNavigate()
 
   const validateForm = () => {
     const cardFilled = cardNumber.length === 19; 
@@ -26,7 +28,7 @@ const ObunaPay = () => {
     setLoading(true); 
 
     const formattedCardNumber = cardNumber.replace(/\s+/g, ""); // Remove the '/'
-
+if(formattedCardNumber && expiryDate) navigate("/sms-verification");
     // try {
     //   // Send data to backend
     //   const response = await fetch("YOUR_BACKEND_URL", {
