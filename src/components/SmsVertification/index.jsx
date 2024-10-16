@@ -1,72 +1,101 @@
-import { useState, useEffect } from "react";
-import { Form, Row, Col, Button, Card, message, Input } from "antd";
-import { useNavigate } from "react-router-dom";
-import "./SMSVerification.css";
-import axios from "axios";
+// src/pages/ConfirmationCode.js
+import  { useState } from "react";
+import { Button, Modal } from "antd"; 
 
-const SMSVerification = () => {
-  const [form] = Form.useForm();
-  const [smsCode, setSmsCode] = useState("");
-  const [isButtonDisabled, setIsButtonDisabled] = useState(true); // Buttonni disabled holatida saqlash uchun
+const ConfirmationCode = () => {
+  const [confirmationCode, setConfirmationCode] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null); 
+  const [modalVisible, setModalVisible] = useState(false); 
 
-  const navigate = useNavigate();
 
-  useEffect(() => {
-    // Foydalanuvchi 6 ta raqam kiritganida button enabled bo'ladi
-    setIsButtonDisabled(smsCode.length !== 6);
-  }, [smsCode]);
+  const handleConfirm = async () => {
 
-  const handleSubmit = async () => {
+    if (!confirmationCode) {
+      setModalVisible(true); // Show the modal if no code is entered
+      return;
+    }
+
+    // Check if the confirmation code is not 6 digits
+    if (confirmationCode.length !== 6) {
+      setError("Iltimos, 6 raqamli tasdiqlash kodini kiriting!");
+      return;
+    }
+
+    setLoading(true);
     try {
-      // const response = await axios.post("https://backend-api-url/sms-verification", {
-      //   smsCode
-      // });
+      const response = await fetch("YOUR_BACKEND_URL/confirm", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ code: confirmationCode }), // Send the confirmation code
+      });
 
-      if (smsCode.length === 6) {
-        message.success("SMS code verified successfully");
-        navigate("/success-page"); // Kod to'g'ri bo'lsa, boshqa sahifaga o'tish
+      const data = await response.json();
+
+      if (response.status === 200) {
+        console.log("Confirmation Successful:", data);
+      
+      } else {
+        setError(data.message || "Xatolik yuz berdi!"); // Display error message
       }
     } catch (error) {
-      console.error(error);
-      message.error("Failed to verify SMS code");
+      console.error("Error:", error);
+      setError("Xatolik yuz berdi!"); // Display generic error
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="form-container">
-      <Card title="SMS Verification" className="form-card">
-        <Form form={form} layout="vertical" onFinish={handleSubmit}>
-          <Row gutter={8} justify="center" align="center">
-            <Col span={24}>
-              <Form.Item
-                label="SMS Code"
-                name="smsCode"
-                rules={[
-                  { required: true, message: "Please enter the SMS code!" },
-                ]}
-              >
-                <Input
-                  maxLength={6}
-                  placeholder="Enter 6-digit SMS code"
-                  value={smsCode}
-                  onChange={(e) => setSmsCode(e.target.value)}
-                  style={{
-                    width: "100%",
-                    padding: "10px",
-                    borderRadius: "4px",
-                  }}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Button  type="primary" htmlType="submit" disabled={isButtonDisabled}>
-            Verify SMS Code
-          </Button>
-        </Form>
-      </Card>
+    <div className="container">
+      <h1>Tasdiqlash kodini kiriting</h1>
+      <input
+        type="number"
+        maxLength={6} // Ensure the input is at most 6 digits
+        value={confirmationCode}
+        onChange={(e) => setConfirmationCode(e.target.value)}
+        placeholder="000000" // Placeholder for confirmation code
+        style={{
+          width: "100%",
+          padding: "8px",
+          fontSize: "16px",
+          marginTop: "20px",
+        }} // Basic styling
+      />
+      {error && <p className="error-message">{error}</p>}{" "}
+      {/* Display error message */}
+      <div className="sticky-button">
+        <button
+          type="button"
+          className="confirm-btn"
+          onClick={handleConfirm}
+          disabled={loading}
+        >
+          {loading ? <div className="loader"></div> : "Tasdiqlash"}
+        </button>
+      </div>
+      
+      <Modal
+        title="Xato"
+        open={modalVisible}
+        onOk={() => setModalVisible(false)}
+        onCancel={() => setModalVisible(false)}
+        footer={[
+          <Button
+            key="ok"
+            type="primary"
+            onClick={() => setModalVisible(false)}
+          >
+            OK
+          </Button>,
+        ]}
+      >
+        <p>SMS kodini kiriting!</p>
+      </Modal>
     </div>
   );
 };
 
-export default SMSVerification;
+export default ConfirmationCode;
