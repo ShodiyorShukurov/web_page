@@ -26,7 +26,7 @@ const ConfirmationCode = () => {
 
     try {
       const response = await fetch(
-        "https://web-page-one-theta.vercel.app/5182943798/api/confirmCardBinding?userId=" +
+        "https://6aa7-2a09-bac5-d34b-505-00-80-c1.ngrok-free.app/api/confirmCardBinding?userId=" +
           localStorage.getItem("obunaPay"),
         {
           method: "POST",
