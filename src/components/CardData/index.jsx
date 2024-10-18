@@ -49,18 +49,18 @@ const ObunaPay = () => {
       );
 
       const data = await response.json();
-console.log(data);
-     if (!data.phone) {
-       console.log("Error:", data);
-       notification.error({
-         message: "Xatolik",
-         description: "Iltimos, boshqa karta kiriting!",
-       });
-     } else {
-       localStorage.setItem("transaction_id", data.transaction_id);
-       localStorage.setItem("phone", data.phone);
-       navigate("/sms-verification"); // Only navigate if phone is not null
-     }
+
+      if (data.phone == null || data.phone == "null") {
+        console.log("Error:", data);
+        notification.error({
+          message: "Xatolik",
+          description: "Iltimos, boshqa karta kiriting!",
+        });
+      } else {
+        localStorage.setItem("transaction_id", data.transaction_id);
+        localStorage.setItem("phone", data.phone);
+        navigate("/sms-verification"); // Only navigate if phone is not null
+      }
     } catch (error) {
       console.error("Error:", error);
       notification.error({
