@@ -1,6 +1,13 @@
-import React, { useState } from "react";
+// Bu qismini olib tashlash yoki alohida faylga qo'ying
+// export default function handler(req, res) {
+//   const referer = req.headers.referer || 'bevosita kirish';
+//   console.log(`Foydalanuvchi qaysi yo'ldan keldi: ${referer}`);
+//   res.status(200).json({ referer });
+// }
+
+import { useState } from "react";
 import MaskedInput from "react-text-mask";
-import { Modal, Button } from "antd"; 
+import { Modal, Button } from "antd";
 import "./ObunaPay.css";
 import { useNavigate } from "react-router-dom";
 
@@ -8,12 +15,12 @@ const ObunaPay = () => {
   const [cardNumber, setCardNumber] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
   const [loading, setLoading] = useState(false);
-  const [isModalVisible, setIsModalVisible] = useState(false); 
-  const navigate = useNavigate()
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const navigate = useNavigate();
 
   const validateForm = () => {
-    const cardFilled = cardNumber.length === 19; 
-    const expiryFilled = expiryDate.length === 5; 
+    const cardFilled = cardNumber.length === 19;
+    const expiryFilled = expiryDate.length === 5;
     return cardFilled && expiryFilled;
   };
 
@@ -21,41 +28,15 @@ const ObunaPay = () => {
     e.preventDefault();
 
     if (!validateForm()) {
-      setIsModalVisible(true); 
+      setIsModalVisible(true);
       return;
     }
 
-    setLoading(true); 
+    setLoading(true);
 
     const formattedCardNumber = cardNumber.replace(/\s+/g, ""); // Remove the '/'
-if(formattedCardNumber && expiryDate) navigate("/sms-verification");
-    // try {
-    //   // Send data to backend
-    //   const response = await fetch("YOUR_BACKEND_URL", {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify({
-    //       formattedCardNumber,
-    //       expiryDate, // In MMYY format
-    //     }),
-    //   });
 
-    //   const data = await response.json();
-
-    //   if (response.status === 200) {
-    //     console.log("Success:", data);
-    //     // Handle success, show confirmation or redirect
-    //   } else {
-    //     console.log("Error:", data);
-    //     // Handle error cases
-    //   }
-    // } catch (error) {
-    //   console.error("Error:", error);
-    // } finally {
-    //   setLoading(false); // Stop loader after backend response
-    // }
+    if (formattedCardNumber && expiryDate) navigate("/sms-verification");
   };
 
   const handleModalOk = () => {

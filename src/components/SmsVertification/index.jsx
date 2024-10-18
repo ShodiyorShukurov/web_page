@@ -1,6 +1,8 @@
 // src/pages/ConfirmationCode.js
 import { useState } from "react";
-import { Button, Modal, Input } from "antd";
+import { Button, Modal } from "antd";
+import MaskedInput  from "react-text-mask";
+import '../CardData/ObunaPay.css'
 
 const ConfirmationCode = () => {
   const [confirmationCode, setConfirmationCode] = useState("");
@@ -8,35 +10,36 @@ const ConfirmationCode = () => {
   const [error, setError] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
 
-  const handleConfirm = async () => {
-    // Check if the confirmation code is not 6 digits
+  const handleConfirm = async (evt) => {
+    evt.preventDefault();
+
     if (confirmationCode.length !== 6) {
-      setModalVisible(true); 
+      setModalVisible(true);
       setError("Iltimos, 6 raqamli tasdiqlash kodini kiriting!"); // Set error message
       return;
     }
 
     setLoading(true);
+
     try {
       const response = await fetch("YOUR_BACKEND_URL/confirm", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ code: confirmationCode }), // Send the confirmation code
+        body: JSON.stringify({ code: confirmationCode }), 
       });
 
       const data = await response.json();
 
       if (response.status === 200) {
         console.log("Confirmation Successful:", data);
-        // Navigate to success page or handle success
       } else {
-        setError(data.message || "Xatolik yuz berdi!"); // Display error message
+        setError(data.message || "Xatolik yuz berdi!");
       }
     } catch (error) {
       console.error("Error:", error);
-      setError("Xatolik yuz berdi!"); // Display generic error
+      setError("Xatolik yuz berdi!"); 
     } finally {
       setLoading(false);
     }
@@ -44,46 +47,37 @@ const ConfirmationCode = () => {
 
   return (
     <div className="container">
-      <h1>Tasdiqlash kodini kiriting</h1>
-      <Input
-        type="text" // Use type="text" to allow custom input validation
-        value={confirmationCode}
-        onChange={(e) => {
-          // Allow only numeric input and limit to 6 characters
-          const value = e.target.value.replace(/\D/g, ""); // Remove non-digit characters
-          if (value.length <= 6) {
-            setConfirmationCode(value);
-          }
-        }}
-        placeholder="000000"
-        style={{
-          width: "100%",
-          padding: "8px",
-          fontSize: "16px",
-          marginTop: "20px",
-        }}
-      />
-      {/* Display error message */}
-      <div className="sticky-button">
-        <button
-          type="button"
-          className="confirm-btn"
-          onClick={handleConfirm}
-          disabled={loading}
-        >
-          {loading ? <div className="loader"></div> : "Tasdiqlash"}
-        </button>
-      </div>
+      <h1 style={{ marginBottom: "20px" }}>Tasdiqlash kodini kiriting</h1>
+      <form>
+        <MaskedInput
+          mask={[/\d/, /\d/, /\d/, /\d/, /\d/, /\d/]}
+          onChange={(evt) => setConfirmationCode(evt.target.value)}
+          value={confirmationCode}
+          placeholder="000000"
+          required
+        />
+
+        <div className="sticky-button">
+          <button
+            type="button"
+            className="confirm-btn"
+            onClick={handleConfirm}
+            disabled={loading}
+          >
+            {loading ? <div className="loader"></div> : "Tasdiqlash"}
+          </button>
+        </div>
+      </form>
       <Modal
         title="Xato"
         open={modalVisible}
         onOk={() => {
           setModalVisible(false);
-          setError(null); // Clear the error message when the modal is closed
+          setError(null);
         }}
         onCancel={() => {
           setModalVisible(false);
-          setError(null); // Clear the error message when the modal is closed
+          setError(null);
         }}
         footer={[
           <Button
