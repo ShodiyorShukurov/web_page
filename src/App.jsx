@@ -7,7 +7,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<CardForm />} />
+        <Route path="/:id" element={<CardForm />} />
         <Route path="/sms-verification" element={<SMSVerification />} />
         <Route
           path="/success-page"
