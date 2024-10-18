@@ -1,6 +1,6 @@
 import { useState } from "react";
 import MaskedInput from "react-text-mask";
-import { Modal, Button } from "antd";
+import { notification } from "antd";
 import "./ObunaPay.css";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -10,7 +10,6 @@ const ObunaPay = () => {
   const [cardNumber, setCardNumber] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
   const [loading, setLoading] = useState(false);
-  const [isModalVisible, setIsModalVisible] = useState(false);
   const navigate = useNavigate();
 
   const validateForm = () => {
@@ -19,17 +18,19 @@ const ObunaPay = () => {
     return cardFilled && expiryFilled;
   };
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!validateForm()) {
-      setIsModalVisible(true);
+      notification.error({
+        message: "Xatolik",
+        description: "Karta ma'lumotlarini qayta tekshiring",
+      });
       return;
     }
 
     setLoading(true);
-    const formattedCardNumber = cardNumber.replace(/\s+/g, ""); 
+    const formattedCardNumber = cardNumber.replace(/\s+/g, "");
 
     try {
       const response = await fetch(
@@ -49,24 +50,26 @@ const ObunaPay = () => {
 
       const data = await response.json();
 
-      if (data) {
-        localStorage.setItem("transaction_id", data.transaction_id);
-        localStorage.setItem("phone", data.phone)
-        navigate("/sms-verification");
-      } else {
+      if (data.phone == null || data.phone === undefined) {
         console.log("Error:", data);
-        setIsModalVisible(true);
+        notification.error({
+          message: "Xatolik",
+          description: "Iltimos, boshqa karta kiriting!",
+        });
+      } else {
+        localStorage.setItem("transaction_id", data.transaction_id);
+        localStorage.setItem("phone", data.phone);
+        navigate("/sms-verification");
       }
     } catch (error) {
       console.error("Error:", error);
-      setIsModalVisible(true);
+      notification.error({
+        message: "Xatolik",
+        description: "Iltimos, boshqa karta kiriting!",
+      });
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleModalOk = () => {
-    setIsModalVisible(false);
   };
 
   return (
@@ -130,16 +133,6 @@ const ObunaPay = () => {
         </p>
       </div>
 
-      {/* Footer Section */}
-      <div className="footer">
-        <div className="payme-logo">
-         {/* <img
-            src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Payme_Logo.png/800px-Payme_Logo.png"
-            alt="Payme"
-          />*/}
-        </div>
-      </div>
-
       {/* Sticky Button with Loader */}
       <div className="sticky-button">
         <button
@@ -151,21 +144,6 @@ const ObunaPay = () => {
           {loading ? <div className="loader"></div> : "Tasdiqlash kodini olish"}
         </button>
       </div>
-
-      {/* Modal for Error Message */}
-      <Modal
-        title="Xatolik"
-        open={isModalVisible}
-        onOk={handleModalOk}
-        onCancel={handleModalOk}
-        footer={[
-          <Button key="ok" type="primary" onClick={handleModalOk}>
-            OK
-          </Button>,
-        ]}
-      >
-        <p>Karta ma&apos;lumotlarini qayta tekshiring</p>
-      </Modal>
     </div>
   );
 };

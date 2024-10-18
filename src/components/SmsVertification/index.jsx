@@ -1,24 +1,29 @@
-// src/pages/ConfirmationCode.js
 import { useState } from "react";
-import { Button, Modal } from "antd";
+import { notification } from "antd";
 import MaskedInput from "react-text-mask";
 import "../CardData/ObunaPay.css";
-import { useParams } from "react-router-dom";
 
 const ConfirmationCode = () => {
-  const { id } = useParams();
-  console.log(id);
   const [confirmationCode, setConfirmationCode] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [modalVisible, setModalVisible] = useState(false);
+
+
+  // Function to show the notification
+  const openNotificationWithIcon = (type, message) => {
+    notification[type]({
+      message: "Xatolik",
+      description: message,
+    });
+  };
 
   const handleConfirm = async (evt) => {
     evt.preventDefault();
 
     if (confirmationCode.length !== 6) {
-      setModalVisible(true);
-      setError("Iltimos, 6 raqamli tasdiqlash kodini kiriting!");
+      openNotificationWithIcon(
+        "error",
+        "Iltimos, 6 raqamli tasdiqlash kodini kiriting!"
+      );
       return;
     }
 
@@ -46,8 +51,8 @@ const ConfirmationCode = () => {
         console.log("Confirmation Successful:", data);
       }
     } catch (error) {
-      console.error("Error:", error);
-      setError("Boshqa kartani kiriting!");
+      console.log(error);
+      openNotificationWithIcon("error", "Boshqa kartani kiriting!");
     } finally {
       setLoading(false);
     }
@@ -63,7 +68,7 @@ const ConfirmationCode = () => {
           : "+" +
             localStorage.getItem("phone").slice(0, 5) +
             "****" +
-            localStorage.getItem("phone").slice(-4)} {' '}
+            localStorage.getItem("phone").slice(-4)}{" "}
         raqamiga yuborilgan tasdiqlash kodini kiriting
       </h1>
       <form>
@@ -86,32 +91,6 @@ const ConfirmationCode = () => {
           </button>
         </div>
       </form>
-      <Modal
-        title="Xato"
-        open={modalVisible}
-        onOk={() => {
-          setModalVisible(false);
-          setError(null);
-        }}
-        onCancel={() => {
-          setModalVisible(false);
-          setError(null);
-        }}
-        footer={[
-          <Button
-            key="ok"
-            type="primary"
-            onClick={() => {
-              setModalVisible(false);
-              setError(null);
-            }}
-          >
-            Yopish
-          </Button>,
-        ]}
-      >
-        <p>{error}</p>
-      </Modal>
     </div>
   );
 };
