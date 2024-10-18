@@ -5,9 +5,9 @@ import "./ObunaPay.css";
 import { useNavigate, useParams } from "react-router-dom";
 
 const ObunaPay = () => {
-  const { params } = useParams();
+  const { id } = useParams();
 
-  console.log(params)
+  console.log(id)
   const [cardNumber, setCardNumber] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
   const [loading, setLoading] = useState(false);
