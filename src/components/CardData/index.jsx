@@ -49,7 +49,7 @@ const ObunaPay = () => {
       );
 
       const data = await response.json();
-
+console.log(data);
      if (!data.phone) {
        console.log("Error:", data);
        notification.error({
