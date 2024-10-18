@@ -40,10 +40,9 @@ const ConfirmationCode = () => {
         }
       );
 
-      const data = await response.json();
-      console.log(data);
+      const data = await response.json()
 
-      if (response.status === 200) {
+      if (data) {
         console.log("Confirmation Successful:", data);
       }
     } catch (error) {

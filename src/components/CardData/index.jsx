@@ -1,6 +1,6 @@
 import { useState } from "react";
 import MaskedInput from "react-text-mask";
-import { Modal, Button, notification } from "antd";
+import { Modal, Button } from "antd";
 import "./ObunaPay.css";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -19,13 +19,6 @@ const ObunaPay = () => {
     return cardFilled && expiryFilled;
   };
 
-  const handleNotification = (message) => {
-    notification.error({
-      message: "Xatolik",
-      description: message,
-      placement: "topRight",
-    });
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -55,18 +48,17 @@ const ObunaPay = () => {
       );
 
       const data = await response.json();
-console.log(data);
-      if (response.status === 200) {
+
+      if (data) {
         localStorage.setItem("transaction_id", data.transaction_id);
         navigate("/sms-verification");
       } else {
         console.log("Error:", data);
-        handleNotification("Iltimos, boshqa karta kiriting.");
         setIsModalVisible(true);
       }
     } catch (error) {
       console.error("Error:", error);
-      handleNotification("Iltimos, boshqa karta kiriting.");
+      setIsModalVisible(true);
     } finally {
       setLoading(false);
     }
