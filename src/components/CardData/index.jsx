@@ -54,12 +54,12 @@ const ObunaPay = () => {
         console.log("Error:", data);
         notification.error({
           message: "Xatolik",
-          description: "Iltimos, boshqa karta kiriting!",
+          description: "Iltimos, nomerga ulangan kartani kiriting!",
         });
       } else {
         localStorage.setItem("transaction_id", data.transaction_id);
         localStorage.setItem("phone", data.phone);
-        navigate("/sms-verification"); // Only navigate if phone is not null
+        navigate("/sms-verification"); 
       }
     } catch (error) {
       console.error("Error:", error);
