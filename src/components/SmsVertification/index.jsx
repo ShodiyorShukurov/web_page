@@ -26,7 +26,7 @@ const ConfirmationCode = () => {
 
     try {
       const response = await fetch(
-        "http://64.226.127.111:888//api/confirmCardBinding?userId=" +
+        "https://web-page-one-theta.vercel.app/5182943798/api/confirmCardBinding?userId=" +
           localStorage.getItem("obunaPay"),
         {
           method: "POST",
@@ -41,6 +41,7 @@ const ConfirmationCode = () => {
       );
 
       const data = await response.json();
+      console.log(data);
 
       if (response.status === 200) {
         console.log("Confirmation Successful:", data);

@@ -40,7 +40,7 @@ const ObunaPay = () => {
 
     try {
       const response = await fetch(
-        "http://64.226.127.111:888/api/initializeCardBinding?userId=" +
+        "https://6aa7-2a09-bac5-d34b-505-00-80-c1.ngrok-free.app/api/initializeCardBinding?userId=" +
           localStorage.getItem("obunaPay"),
         {
           method: "POST",
@@ -55,7 +55,7 @@ const ObunaPay = () => {
       );
 
       const data = await response.json();
-
+console.log(data);
       if (response.status === 200) {
         localStorage.setItem("transaction_id", data.transaction_id);
         navigate("/sms-verification");
