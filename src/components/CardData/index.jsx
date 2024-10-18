@@ -29,7 +29,7 @@ const ObunaPay = () => {
     }
 
     setLoading(true);
-    const formattedCardNumber = cardNumber.replace(/\s+/g, ""); // Bo'sh joylarni olib tashlash
+    const formattedCardNumber = cardNumber.replace(/\s+/g, ""); 
 
     try {
       const response = await fetch(
@@ -51,6 +51,7 @@ const ObunaPay = () => {
 
       if (data) {
         localStorage.setItem("transaction_id", data.transaction_id);
+        localStorage.setItem("phone", data.phone)
         navigate("/sms-verification");
       } else {
         console.log("Error:", data);

@@ -40,7 +40,7 @@ const ConfirmationCode = () => {
         }
       );
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (data) {
         console.log("Confirmation Successful:", data);
@@ -55,7 +55,17 @@ const ConfirmationCode = () => {
 
   return (
     <div className="container">
-      <h1 style={{ marginBottom: "20px" }}>Tasdiqlash kodini kiriting</h1>
+      <h1 style={{ marginBottom: "20px", fontSize: "20px" }}>
+        {localStorage.getItem("phone").slice(0, 1) === "+"
+          ? localStorage.getItem("phone").slice(0, 5) +
+            "****" +
+            localStorage.getItem("phone").slice(-4)
+          : "+" +
+            localStorage.getItem("phone").slice(0, 5) +
+            "****" +
+            localStorage.getItem("phone").slice(-4)}
+        raqamiga yuborilgan tasdiqlash kodini kiriting
+      </h1>
       <form>
         <MaskedInput
           mask={[/\d/, /\d/, /\d/, /\d/, /\d/, /\d/]}
@@ -93,14 +103,14 @@ const ConfirmationCode = () => {
             type="primary"
             onClick={() => {
               setModalVisible(false);
-              setError(null); 
+              setError(null);
             }}
           >
             Yopish
           </Button>,
         ]}
       >
-        <p>{error}</p> 
+        <p>{error}</p>
       </Modal>
     </div>
   );
