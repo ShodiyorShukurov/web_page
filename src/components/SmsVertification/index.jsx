@@ -1,10 +1,13 @@
 // src/pages/ConfirmationCode.js
 import { useState } from "react";
 import { Button, Modal } from "antd";
-import MaskedInput  from "react-text-mask";
-import '../CardData/ObunaPay.css'
+import MaskedInput from "react-text-mask";
+import "../CardData/ObunaPay.css";
+import { useParams } from "react-router-dom";
 
 const ConfirmationCode = () => {
+  const { id } = useParams();
+  console.log(id);
   const [confirmationCode, setConfirmationCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -15,31 +18,36 @@ const ConfirmationCode = () => {
 
     if (confirmationCode.length !== 6) {
       setModalVisible(true);
-      setError("Iltimos, 6 raqamli tasdiqlash kodini kiriting!"); // Set error message
+      setError("Iltimos, 6 raqamli tasdiqlash kodini kiriting!");
       return;
     }
 
     setLoading(true);
 
     try {
-      const response = await fetch("YOUR_BACKEND_URL/confirm", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ code: confirmationCode }), 
-      });
+      const response = await fetch(
+        "http://64.226.127.111:888//api/confirmCardBinding?userId=" +
+          localStorage.getItem("obunaPay"),
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            otp: confirmationCode,
+            transaction_id: localStorage.getItem("transaction_id"),
+          }),
+        }
+      );
 
       const data = await response.json();
 
       if (response.status === 200) {
         console.log("Confirmation Successful:", data);
-      } else {
-        setError(data.message || "Xatolik yuz berdi!");
       }
     } catch (error) {
       console.error("Error:", error);
-      setError("Xatolik yuz berdi!"); 
+      setError("Boshqa kartani kiriting!");
     } finally {
       setLoading(false);
     }
@@ -85,14 +93,14 @@ const ConfirmationCode = () => {
             type="primary"
             onClick={() => {
               setModalVisible(false);
-              setError(null); // Clear the error message when the modal is closed
+              setError(null); 
             }}
           >
             Yopish
           </Button>,
         ]}
       >
-        <p>{error}</p> {/* Display the error message in the modal */}
+        <p>{error}</p> 
       </Modal>
     </div>
   );

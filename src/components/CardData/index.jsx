@@ -1,13 +1,12 @@
 import { useState } from "react";
 import MaskedInput from "react-text-mask";
-import { Modal, Button } from "antd";
+import { Modal, Button, notification } from "antd";
 import "./ObunaPay.css";
 import { useNavigate, useParams } from "react-router-dom";
 
 const ObunaPay = () => {
   const { id } = useParams();
-
-  console.log(id)
+  localStorage.setItem("obunaPay", id);
   const [cardNumber, setCardNumber] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
   const [loading, setLoading] = useState(false);
@@ -20,6 +19,14 @@ const ObunaPay = () => {
     return cardFilled && expiryFilled;
   };
 
+  const handleNotification = (message) => {
+    notification.error({
+      message: "Xatolik",
+      description: message,
+      placement: "topRight",
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -29,40 +36,44 @@ const ObunaPay = () => {
     }
 
     setLoading(true);
-
-    const formattedCardNumber = cardNumber.replace(/\s+/g, ""); // Remove the '/'
+    const formattedCardNumber = cardNumber.replace(/\s+/g, ""); // Bo'sh joylarni olib tashlash
 
     try {
-      // Send data to backend
-      const response = await fetch("" + "/initializeCardBinding?userId=" + params, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          formattedCardNumber,
-          expiryDate, // In MMYY format
-        }),
-      });
+      const response = await fetch(
+        "http://64.226.127.111:888/api/initializeCardBinding?userId=" +
+          localStorage.getItem("obunaPay"),
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            card_number: formattedCardNumber,
+            expiry: expiryDate,
+          }),
+        }
+      );
 
       const data = await response.json();
 
       if (response.status === 200) {
-        console.log("Success:", data);
-        // Handle success, show confirmation or redirect
+        localStorage.setItem("transaction_id", data.transaction_id);
+        navigate("/sms-verification");
       } else {
         console.log("Error:", data);
-        // Handle error cases
+        handleNotification("Iltimos, boshqa karta kiriting.");
+        setIsModalVisible(true);
       }
     } catch (error) {
       console.error("Error:", error);
+      handleNotification("Iltimos, boshqa karta kiriting.");
     } finally {
-      setLoading(false); // Stop loader after backend response
+      setLoading(false);
     }
   };
 
   const handleModalOk = () => {
-    setIsModalVisible(false); // Close modal on OK
+    setIsModalVisible(false);
   };
 
   return (
@@ -71,7 +82,6 @@ const ObunaPay = () => {
       <div className="form-section">
         <h1>Bank kartasi ma&apos;lumotlarini kiriting</h1>
         <form onSubmit={handleSubmit}>
-          {/* Masked Input for Card Number */}
           <MaskedInput
             mask={[
               /\d/,
@@ -100,7 +110,6 @@ const ObunaPay = () => {
             onChange={(e) => setCardNumber(e.target.value)}
             required
           />
-
           <MaskedInput
             mask={[/\d/, /\d/, "/", /\d/, /\d/]}
             className="card-expiry"
