@@ -133,10 +133,10 @@ const ObunaPay = () => {
       {/* Footer Section */}
       <div className="footer">
         <div className="payme-logo">
-          <img
+         {/* <img
             src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Payme_Logo.png/800px-Payme_Logo.png"
             alt="Payme"
-          />
+          />*/}
         </div>
       </div>
 
