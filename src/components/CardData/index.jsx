@@ -13,15 +13,20 @@ const ObunaPay = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (window.Telegram) {
-      window.Telegram.WebApp.MainButton.setText("Tasdiqlash")
-        .show()
-        .onClick(handleSubmit); // Tugmaga handleConfirm funksiyasini bog'lash
-      return () => {
-        // Component unmounted bo'lganda tugmani yashirish
-        window.Telegram.WebApp.MainButton.hide();
-      };
-    }
+     if (window.Telegram) {
+       // Main Button'ni sozlash
+       window.Telegram.WebApp.MainButton.setText("Tasdiqlash")
+         .show()
+         .onClick(handleSubmit);
+     } else {
+       console.log("Telegram WebApp SDK yuklanmagan");
+     }
+
+     return () => {
+       if (window.Telegram) {
+         window.Telegram.WebApp.MainButton.hide();
+       }
+     };
   }, [expiryDate, cardNumber]);
 
   const validateForm = () => {
@@ -30,8 +35,8 @@ const ObunaPay = () => {
     return cardFilled && expiryFilled;
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
+
 
     if (!validateForm()) {
       notification.error({
