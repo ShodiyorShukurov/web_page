@@ -45,9 +45,7 @@ const ObunaPay = () => {
   };
 
   const handleSubmit = async () => {
-    // if (loading) return;
-
-    console.log("Loading")
+    console.log(expiryDate, cardNumber);
     if (!validateForm()) {
       notification.error({
         message: "Xatolik",
