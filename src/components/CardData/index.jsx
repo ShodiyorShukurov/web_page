@@ -10,7 +10,7 @@ const ObunaPay = () => {
   const navigate = useNavigate();
 
   const validateCardNumber = (value) => {
-    return value && value.length === 19; // Karta raqami 19 belgidan iborat bo'lishi kerak
+    return value && value.length === 16; // Karta raqami 19 belgidan iborat bo'lishi kerak
   };
 
   const validateExpiryDate = (value) => {
@@ -18,13 +18,14 @@ const ObunaPay = () => {
   };
 
   const validateForm = () => {
-    const cardNumber = document.querySelector(".card-number").value;
+    const cardNumber = document
+      .querySelector(".card-number")
+      .value.replace(/\s+/g, "");
     const expiryDate = document.querySelector(".card-expiry").value;
 
     const cardValid = validateCardNumber(cardNumber);
     const expiryValid = validateExpiryDate(expiryDate);
 
-    console.log("cardValid:" + cardValid);
     if (!cardValid) {
       notification.error({
         message: "Xatolik",
@@ -32,6 +33,7 @@ const ObunaPay = () => {
       });
     }
 
+    console.log("cardValid:" + expiryValid);
     if (!expiryValid) {
       notification.error({
         message: "Xatolik",
@@ -53,7 +55,7 @@ const ObunaPay = () => {
       .value.replace(/\s+/g, "");
     const expiryDate = document.querySelector(".card-expiry").value;
 
-    console.log(cardNumber);
+    console.log(expiryDate);
     try {
       const response = await fetch(
         "https://b2b0-84-54-78-192.ngrok-free.app/api/initializeCardBinding?userId=" +
