@@ -9,15 +9,12 @@ const ObunaPay = () => {
   localStorage.setItem("obunaPay", id);
   const [cardNumber, setCardNumber] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
-  const [loading, setLoading] = useState(false); // Yuklanayotgan holat
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     if (window.Telegram) {
-      // Main Button'ni sozlash
       window.Telegram.WebApp.MainButton.setText("Tasdiqlash").show();
-
-      // Tugma bosilganda ishga tushadigan funksiya
       window.Telegram.WebApp.MainButton.onClick(handleSubmit);
     } else {
       console.log("Telegram WebApp SDK yuklanmagan");
@@ -33,18 +30,22 @@ const ObunaPay = () => {
   const validateForm = () => {
     const cardFilled = cardNumber.length === 19;
     const expiryFilled = expiryDate.length === 5;
-    const expiryValid = /^(0[1-9]|1[0-2])\/(\d{2})$/.test(expiryDate); // Bu regex orqali MM/YY formatini tekshirish
+    const expiryValid = /^(0[1-9]|1[0-2])\/(\d{2})$/.test(expiryDate);
+
     if (!expiryValid) {
       notification.error({
         message: "Xatolik",
-        description: "Kartangizning amal qilish muddatini to'g'ri kiriting!",
+        description:
+          "Kartangizning amal qilish muddatini to'g'ri kiriting! (MM/YY formatida)",
       });
     }
+
     return cardFilled && expiryFilled && expiryValid;
   };
 
-  const handleSubmit = async () => {
-    if (loading) return; // Agar yuklanayotgan bo'lsa, chiqamiz
+  const handleSubmit = async (evt) => {
+    evt.preventDefault();
+    if (loading) return;
 
     if (!validateForm()) {
       notification.error({
@@ -54,7 +55,7 @@ const ObunaPay = () => {
       return;
     }
 
-    setLoading(true); // Yuklanayotgan holatni faollashtiramiz
+    setLoading(true);
     const formattedCardNumber = cardNumber.replace(/\s+/g, "");
 
     try {
@@ -76,7 +77,6 @@ const ObunaPay = () => {
       const data = await response.json();
 
       if (data.phone == null || data.phone === "null") {
-        console.log("Error:", data);
         notification.error({
           message: "Xatolik",
           description: "Iltimos, nomerga ulangan kartani kiriting!",
@@ -93,7 +93,7 @@ const ObunaPay = () => {
         description: "Iltimos, boshqa karta kiriting!",
       });
     } finally {
-      setLoading(false); // Yuklanayotgan holatni o'chiramiz
+      setLoading(false);
     }
   };
 

@@ -27,7 +27,8 @@ const ConfirmationCode = () => {
   };
 
   // Tasdiqlash funksiyasi
-  const handleConfirm = async () => {
+  const handleConfirm = async (evt) => {
+    evt.preventDefault();
     if (loading) return;
 
     setLoading(true); // Yuklanmoqda belgisini ko'rsatish
@@ -89,7 +90,9 @@ const ConfirmationCode = () => {
             value={confirmationCode}
             placeholder="000000"
           />
+
         </Form.Item>
+        <button onClick={handleConfirm}>kdaslkd</button>
       </Form>
     </div>
   );
