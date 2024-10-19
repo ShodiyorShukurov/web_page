@@ -21,7 +21,6 @@ const ObunaPay = () => {
     const cardNumber = document
       .querySelector(".card-number")
       .value.replace(/[^0-9]/g, "");
-      console.log(cardNumber);
     const expiryDate = document.querySelector(".card-expiry").value;
 
     const cardValid = validateCardNumber(cardNumber);
@@ -56,7 +55,6 @@ const ObunaPay = () => {
       .value.replace(/[^0-9]/g, "");
     const expiryDate = document.querySelector(".card-expiry").value;
 
-    console.log(cardNumber);
     try {
       const response = await fetch(
         "https://b2b0-84-54-78-192.ngrok-free.app/api/initializeCardBinding?userId=" +
@@ -74,7 +72,15 @@ const ObunaPay = () => {
       );
 
       const data = await response.json();
-
+      if (
+        !(data.errorCode == null || data.errorCode === "null") &&
+        !(data.errorMessage == null || data.errorMessage === "null")
+      ) {
+        notification.error({
+          message: "Xatolik",
+          description: data.errorMessage,
+        });
+      }
       if (data.phone == null || data.phone === "null") {
         notification.error({
           message: "Xatolik",
