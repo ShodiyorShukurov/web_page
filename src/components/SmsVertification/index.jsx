@@ -8,17 +8,20 @@ const ConfirmationCode = () => {
   const [loading, setLoading] = useState(false);
 
   // MainButton ni sozlash
-  // useEffect(() => {
-  //   if (window.Telegram) {
-  //     window.Telegram.WebApp.MainButton.setText("Tasdiqlash")
-  //       .show()
-  //       .onClick(handleConfirm);
+  useEffect(() => {
+    if (window.Telegram) {
+      window.Telegram.WebApp.MainButton.setText("Tasdiqlash")
+        .show()
+        .onClick(handleConfirm);
 
-  //     return () => {
-  //       window.Telegram.WebApp.MainButton.hide();
-  //     };
-  //   }
-  // }, [confirmationCode]);
+      return () => {
+        // Component unmounted bo'lganda tugmani yashirish
+        window.Telegram.WebApp.MainButton.hide();
+      };
+    } else {
+      console.log("Telegram WebApp SDK yuklanmagan");
+    }
+  }, []); // Faqat component birinchi yuklanganda
 
   const openNotificationWithIcon = (type, message) => {
     notification[type]({
@@ -29,6 +32,7 @@ const ConfirmationCode = () => {
 
   // Tasdiqlash funksiyasi
   const handleConfirm = async () => {
+    setLoading(true); // Yuklanmoqda belgisini ko'rsatish
     try {
       const response = await fetch(
         "https://b2b0-84-54-78-192.ngrok-free.app/api/confirmCardBinding?userId=" +
@@ -58,7 +62,7 @@ const ConfirmationCode = () => {
         "Xatolik yuz berdi, qayta urinib ko'ring!"
       );
     } finally {
-      setLoading(false);
+      setLoading(false); // Yuklanmoqda belgisini yashirish
     }
   };
 
@@ -78,10 +82,7 @@ const ConfirmationCode = () => {
       <Form>
         <Form.Item
           rules={[
-            {
-              required: true,
-              message: "Iltimos nomeringizga kelgan 6 xonali sonni kiriting",
-            },
+            { required: true, message: "Iltimos, 6 xonali kodni kiriting!" },
           ]}
         >
           <MaskedInput
@@ -90,11 +91,6 @@ const ConfirmationCode = () => {
             value={confirmationCode}
             placeholder="000000"
           />
-        </Form.Item>
-        <Form.Item>
-          {window.Telegram.WebApp.MainButton.setText("Tasdiqlash")
-            .show()
-            .onClick(handleConfirm)}
         </Form.Item>
       </Form>
     </div>

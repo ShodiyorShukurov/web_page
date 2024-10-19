@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import MaskedInput from "react-text-mask";
 import { notification } from "antd";
 import "./ObunaPay.css";
@@ -59,7 +59,7 @@ const ObunaPay = () => {
       } else {
         localStorage.setItem("transaction_id", data.transaction_id);
         localStorage.setItem("phone", data.phone);
-        navigate("/sms-verification"); 
+        navigate("/sms-verification");
       }
     } catch (error) {
       console.error("Error:", error);
@@ -71,6 +71,24 @@ const ObunaPay = () => {
       setLoading(false);
     }
   };
+
+  // MainButton-ni sozlash
+  useEffect(() => {
+    if (window.Telegram) {
+      window.Telegram.WebApp.MainButton.setText("Tasdiqlash")
+        .show()
+        .onClick(handleSubmit);
+    } else {
+      console.log("Telegram WebApp SDK yuklanmagan");
+    }
+
+    return () => {
+      // Component unmounted bo'lganda tugmani yashirish
+      if (window.Telegram) {
+        window.Telegram.WebApp.MainButton.hide();
+      }
+    };
+  }, []); // Faqat birinchi yuklashda chaqiriladi
 
   return (
     <div className="container">
@@ -132,18 +150,6 @@ const ObunaPay = () => {
           saqlamaydi.
         </p>
       </div>
-
-      {/* Sticky Button with Loader */}
-     {/* <div className="sticky-button">*/}
-        <button
-          type="submit"
-          className="confirm-btn"
-          onClick={handleSubmit}
-          disabled={loading}
-        >
-          {loading ? <div className="loader"></div> : "Tasdiqlash kodini olish"}
-        </button>
-     {/* </div>*/}
     </div>
   );
 };
