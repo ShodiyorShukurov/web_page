@@ -9,9 +9,9 @@ const ConfirmationCode = () => {
 
   useEffect(() => {
     if (window.Telegram) {
-      window.Telegram.WebApp.MainButton.setText("Tasdiqlash")
-        .show()
-        .onClick(); // Tugmaga handleConfirm funksiyasini bog'lash
+      window.Telegram.WebApp.MainButton.setText("Tasdiqlash").show().onClick(); 
+      // Tugmaga handleConfirm funksiyasini bog'lash
+      window.Telegram.WebApp.MainButton.onClick(handleConfirm);
       return () => {
         // Component unmounted bo'lganda tugmani yashirish
         window.Telegram.WebApp.MainButton.hide();
@@ -21,13 +21,15 @@ const ConfirmationCode = () => {
 
   const openNotificationWithIcon = (type, message) => {
     notification[type]({
-      message: type === "error" ? "Xatolik" : "Muvaffaqiyatli",
+      message: type,
       description: message,
     });
   };
 
   // Tasdiqlash funksiyasi
   const handleConfirm = async () => {
+    if (loading) return;
+
     setLoading(true); // Yuklanmoqda belgisini ko'rsatish
     try {
       const response = await fetch(
@@ -87,7 +89,6 @@ const ConfirmationCode = () => {
             value={confirmationCode}
             placeholder="000000"
           />
-          <button onClick={handleConfirm}></button>
         </Form.Item>
       </Form>
     </div>

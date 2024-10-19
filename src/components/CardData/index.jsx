@@ -9,25 +9,26 @@ const ObunaPay = () => {
   localStorage.setItem("obunaPay", id);
   const [cardNumber, setCardNumber] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); // Yuklanayotgan holat
   const navigate = useNavigate();
 
   useEffect(() => {
-     if (window.Telegram) {
-       // Main Button'ni sozlash
-       window.Telegram.WebApp.MainButton.setText("Tasdiqlash")
-         .show()
-         .onClick(handleSubmit);
-     } else {
-       console.log("Telegram WebApp SDK yuklanmagan");
-     }
+    if (window.Telegram) {
+      // Main Button'ni sozlash
+      window.Telegram.WebApp.MainButton.setText("Tasdiqlash").show();
 
-     return () => {
-       if (window.Telegram) {
-         window.Telegram.WebApp.MainButton.hide();
-       }
-     };
-  }, [expiryDate, cardNumber]);
+      // Tugma bosilganda ishga tushadigan funksiya
+      window.Telegram.WebApp.MainButton.onClick(handleSubmit);
+    } else {
+      console.log("Telegram WebApp SDK yuklanmagan");
+    }
+
+    return () => {
+      if (window.Telegram) {
+        window.Telegram.WebApp.MainButton.hide();
+      }
+    };
+  }, []);
 
   const validateForm = () => {
     const cardFilled = cardNumber.length === 19;
@@ -36,7 +37,7 @@ const ObunaPay = () => {
   };
 
   const handleSubmit = async () => {
-
+    if (loading) return; // Agar yuklanayotgan bo'lsa, chiqamiz
 
     if (!validateForm()) {
       notification.error({
@@ -46,7 +47,7 @@ const ObunaPay = () => {
       return;
     }
 
-    setLoading(true);
+    setLoading(true); // Yuklanayotgan holatni faollashtiramiz
     const formattedCardNumber = cardNumber.replace(/\s+/g, "");
 
     try {
@@ -67,7 +68,7 @@ const ObunaPay = () => {
 
       const data = await response.json();
 
-      if (data.phone == null || data.phone == "null") {
+      if (data.phone == null || data.phone === "null") {
         console.log("Error:", data);
         notification.error({
           message: "Xatolik",
@@ -85,7 +86,7 @@ const ObunaPay = () => {
         description: "Iltimos, boshqa karta kiriting!",
       });
     } finally {
-      setLoading(false);
+      setLoading(false); // Yuklanayotgan holatni o'chiramiz
     }
   };
 
@@ -93,48 +94,46 @@ const ObunaPay = () => {
     <div className="container">
       <div className="form-section">
         <h1>Bank kartasi ma&apos;lumotlarini kiriting</h1>
-        <form onSubmit={handleSubmit}>
-          <MaskedInput
-            mask={[
-              /\d/,
-              /\d/,
-              /\d/,
-              /\d/,
-              " ",
-              /\d/,
-              /\d/,
-              /\d/,
-              /\d/,
-              " ",
-              /\d/,
-              /\d/,
-              /\d/,
-              /\d/,
-              " ",
-              /\d/,
-              /\d/,
-              /\d/,
-              /\d/,
-            ]}
-            className="card-number"
-            placeholder="0000 0000 0000 0000"
-            value={cardNumber}
-            onChange={(e) => setCardNumber(e.target.value)}
-            required
-          />
-          <MaskedInput
-            mask={[/\d/, /\d/, "/", /\d/, /\d/]}
-            className="card-expiry"
-            placeholder="MM/YY"
-            value={expiryDate}
-            onChange={(e) => setExpiryDate(e.target.value)}
-            required
-          />
-          <p>
-            To&apos;lovlar faqatgina UzCard va Humo kartalari orqali amalga
-            oshiriladi.
-          </p>
-        </form>
+        <MaskedInput
+          mask={[
+            /\d/,
+            /\d/,
+            /\d/,
+            /\d/,
+            " ",
+            /\d/,
+            /\d/,
+            /\d/,
+            /\d/,
+            " ",
+            /\d/,
+            /\d/,
+            /\d/,
+            /\d/,
+            " ",
+            /\d/,
+            /\d/,
+            /\d/,
+            /\d/,
+          ]}
+          className="card-number"
+          placeholder="0000 0000 0000 0000"
+          value={cardNumber}
+          onChange={(e) => setCardNumber(e.target.value)}
+          required
+        />
+        <MaskedInput
+          mask={[/\d/, /\d/, "/", /\d/, /\d/]}
+          className="card-expiry"
+          placeholder="MM/YY"
+          value={expiryDate}
+          onChange={(e) => setExpiryDate(e.target.value)}
+          required
+        />
+        <p>
+          To&apos;lovlar faqatgina UzCard va Humo kartalari orqali amalga
+          oshiriladi.
+        </p>
       </div>
 
       <div className="security-info">
