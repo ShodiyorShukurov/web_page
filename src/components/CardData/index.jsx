@@ -44,57 +44,61 @@ const ObunaPay = () => {
     return cardFilled && expiryFilled && expiryValid;
   };
 
-  const handleSubmit = async () => {
-    console.log(expiryDate, cardNumber);
-    if (!validateForm()) {
-      notification.error({
-        message: "Xatolik",
-        description: "Karta ma'lumotlarini qayta tekshiring",
-      });
-      return;
-    }
+const handleSubmit = async () => {
+  console.log("Expiry Date:", expiryDate);
+  console.log("Card Number:", cardNumber);
 
-    setLoading(true);
-    const formattedCardNumber = cardNumber.replace(/\s+/g, "");
+  // Formani tasdiqlash
+  if (!validateForm()) {
+    notification.error({
+      message: "Xatolik",
+      description: "Karta ma'lumotlarini qayta tekshiring",
+    });
+    return;
+  }
 
-    try {
-      const response = await fetch(
-        "https://b2b0-84-54-78-192.ngrok-free.app/api/initializeCardBinding?userId=" +
-          localStorage.getItem("obunaPay"),
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            card_number: formattedCardNumber,
-            expiry: expiryDate,
-          }),
-        }
-      );
+  setLoading(true); // Xavfsizlik maqsadida shartdan keyin o'rnatildi
+  const formattedCardNumber = cardNumber.replace(/\s+/g, "");
 
-      const data = await response.json();
-
-      if (data.phone == null || data.phone === "null") {
-        notification.error({
-          message: "Xatolik",
-          description: "Iltimos, nomerga ulangan kartani kiriting!",
-        });
-      } else {
-        localStorage.setItem("transaction_id", data.transaction_id);
-        localStorage.setItem("phone", data.phone);
-        navigate("/sms-verification");
+  try {
+    const response = await fetch(
+      "https://b2b0-84-54-78-192.ngrok-free.app/api/initializeCardBinding?userId=" +
+        localStorage.getItem("obunaPay"),
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          card_number: formattedCardNumber,
+          expiry: expiryDate,
+        }),
       }
-    } catch (error) {
-      console.error("Error:", error);
+    );
+
+    const data = await response.json();
+
+    if (data.phone == null || data.phone === "null") {
       notification.error({
         message: "Xatolik",
-        description: "Iltimos, boshqa karta kiriting!",
+        description: "Iltimos, nomerga ulangan kartani kiriting!",
       });
-    } finally {
-      setLoading(false);
+    } else {
+      localStorage.setItem("transaction_id", data.transaction_id);
+      localStorage.setItem("phone", data.phone);
+      navigate("/sms-verification");
     }
-  };
+  } catch (error) {
+    console.error("Error:", error);
+    notification.error({
+      message: "Xatolik",
+      description: "Iltimos, boshqa karta kiriting!",
+    });
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <div className="container">
