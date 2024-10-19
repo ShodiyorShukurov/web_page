@@ -7,21 +7,17 @@ const ConfirmationCode = () => {
   const [confirmationCode, setConfirmationCode] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // MainButton ni sozlash
   useEffect(() => {
     if (window.Telegram) {
       window.Telegram.WebApp.MainButton.setText("Tasdiqlash")
         .show()
-        .onClick(handleConfirm);
-
+        .onClick(); // Tugmaga handleConfirm funksiyasini bog'lash
       return () => {
         // Component unmounted bo'lganda tugmani yashirish
         window.Telegram.WebApp.MainButton.hide();
       };
-    } else {
-      console.log("Telegram WebApp SDK yuklanmagan");
     }
-  }, []); // Faqat component birinchi yuklanganda
+  }, [confirmationCode]); // confirmationCode o'zgarsa tugmani yangilash
 
   const openNotificationWithIcon = (type, message) => {
     notification[type]({
@@ -91,6 +87,7 @@ const ConfirmationCode = () => {
             value={confirmationCode}
             placeholder="000000"
           />
+          <button onClick={handleConfirm}></button>
         </Form.Item>
       </Form>
     </div>

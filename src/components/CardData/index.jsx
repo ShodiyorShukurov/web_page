@@ -12,6 +12,18 @@ const ObunaPay = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if (window.Telegram) {
+      window.Telegram.WebApp.MainButton.setText("Tasdiqlash")
+        .show()
+        .onClick(handleSubmit); // Tugmaga handleConfirm funksiyasini bog'lash
+      return () => {
+        // Component unmounted bo'lganda tugmani yashirish
+        window.Telegram.WebApp.MainButton.hide();
+      };
+    }
+  }, [expiryDate, cardNumber]);
+
   const validateForm = () => {
     const cardFilled = cardNumber.length === 19;
     const expiryFilled = expiryDate.length === 5;
@@ -72,27 +84,8 @@ const ObunaPay = () => {
     }
   };
 
-  // MainButton-ni sozlash
-  useEffect(() => {
-    if (window.Telegram) {
-      window.Telegram.WebApp.MainButton.setText("Tasdiqlash")
-        .show()
-        .onClick(handleSubmit);
-    } else {
-      console.log("Telegram WebApp SDK yuklanmagan");
-    }
-
-    return () => {
-      // Component unmounted bo'lganda tugmani yashirish
-      if (window.Telegram) {
-        window.Telegram.WebApp.MainButton.hide();
-      }
-    };
-  }, []); // Faqat birinchi yuklashda chaqiriladi
-
   return (
     <div className="container">
-      {/* Form Section */}
       <div className="form-section">
         <h1>Bank kartasi ma&apos;lumotlarini kiriting</h1>
         <form onSubmit={handleSubmit}>
@@ -139,7 +132,6 @@ const ObunaPay = () => {
         </form>
       </div>
 
-      {/* Security Information Section */}
       <div className="security-info">
         <p>
           Xavfsizlik maqsadida sizning bank kartangiz ma&apos;lumotlari PayMe
