@@ -34,7 +34,7 @@ const ObunaPay = () => {
 
     try {
       const response = await fetch(
-        "https://0fdb-84-54-78-192.ngrok-free.app/api/initializeCardBinding?userId=" +
+        "https://b2b0-84-54-78-192.ngrok-free.app/api/initializeCardBinding?userId=" +
           localStorage.getItem("obunaPay"),
         {
           method: "POST",
@@ -49,7 +49,7 @@ const ObunaPay = () => {
       );
 
       const data = await response.json();
-      
+
       if (data.phone == null || data.phone == "null") {
         console.log("Error:", data);
         notification.error({
