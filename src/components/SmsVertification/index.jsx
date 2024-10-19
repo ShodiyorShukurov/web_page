@@ -1,5 +1,4 @@
-/* global Telegram */
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { notification } from "antd";
 import MaskedInput from "react-text-mask";
 import "../CardData/ObunaPay.css";
@@ -8,7 +7,21 @@ const ConfirmationCode = () => {
   const [confirmationCode, setConfirmationCode] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Function to show the notification
+  // MainButton ni sozlash
+  useEffect(() => {
+    if (window.Telegram) {
+      window.Telegram.WebApp.MainButton.setText("Tasdiqlash")
+        .show()
+        .onClick(handleConfirm); // Tugmaga handleConfirm funksiyasini bog'lash
+
+      return () => {
+        // Component unmounted bo'lganda tugmani yashirish
+        window.Telegram.WebApp.MainButton.hide();
+      };
+    }
+  }, [confirmationCode]); // confirmationCode o'zgarsa tugmani yangilash
+
+  // Notification ko'rsatish uchun funksiya
   const openNotificationWithIcon = (type, message) => {
     notification[type]({
       message: type === "error" ? "Xatolik" : "Muvaffaqiyatli",
@@ -16,20 +29,8 @@ const ConfirmationCode = () => {
     });
   };
 
-  // Function to handle Telegram WebApp button
-  const handleMainButton = (data) => {
-    if (data.user_id !== null) {
-      window.Telegram.WebApp.MainButton.setText("CLOSE WEBVIEW")
-        .show()
-        .onClick(() => {
-          Telegram.WebApp.close();
-        });
-    }
-  };
-
-  const handleConfirm = async (evt) => {
-    evt.preventDefault();
-
+  // Tasdiqlash funksiyasi
+  const handleConfirm = async () => {
     if (confirmationCode.length !== 6) {
       openNotificationWithIcon(
         "error",
@@ -57,17 +58,18 @@ const ConfirmationCode = () => {
       );
 
       const data = await response.json();
-
-      if (data.card_id != null && data.user_id != null) {
-        console.log("Confirmation Successful:", data);
+      if (data.card_id != null && window.Telegram) {
         openNotificationWithIcon("success", "Sizning kartangiz ulandi");
-        handleMainButton(data); 
+        window.Telegram.WebApp.close(); // Kartani tasdiqlaganda WebView ni yopish
       } else {
         openNotificationWithIcon("error", "Boshqa kartani kiriting!");
       }
     } catch (error) {
       console.log(error);
-      openNotificationWithIcon("error", "Boshqa kartani kiriting!");
+      openNotificationWithIcon(
+        "error",
+        "Xatolik yuz berdi, qayta urinib ko'ring!"
+      );
     } finally {
       setLoading(false);
     }
@@ -94,17 +96,6 @@ const ConfirmationCode = () => {
           placeholder="000000"
           required
         />
-
-        <div className="sticky-button">
-          <button
-            type="button"
-            className="confirm-btn"
-            onClick={handleConfirm}
-            disabled={loading}
-          >
-            {loading ? <div className="loader"></div> : "Tasdiqlash"}
-          </button>
-        </div>
       </form>
     </div>
   );
