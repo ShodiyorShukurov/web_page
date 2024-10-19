@@ -19,10 +19,10 @@ const ConfirmationCode = () => {
   // Function to handle Telegram WebApp button
   const handleMainButton = (data) => {
     if (data.user_id !== null) {
-      Telegram.WebApp.MainButton.setText("CLOSE WEBVIEW")
+      window.Telegram.WebApp.MainButton.setText("CLOSE WEBVIEW")
         .show()
         .onClick(() => {
-          Telegram.WebApp.close(); 
+          Telegram.WebApp.close();
         });
     }
   };
@@ -61,7 +61,7 @@ const ConfirmationCode = () => {
       if (data.card_id != null && data.user_id != null) {
         console.log("Confirmation Successful:", data);
         openNotificationWithIcon("success", "Sizning kartangiz ulandi");
-        handleMainButton(data); // Check and show Telegram WebApp MainButton
+        handleMainButton(data); 
       } else {
         openNotificationWithIcon("error", "Boshqa kartani kiriting!");
       }
