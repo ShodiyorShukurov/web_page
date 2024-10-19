@@ -10,8 +10,8 @@ const ObunaPay = () => {
   const [cardNumber, setCardNumber] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
   const [loading, setLoading] = useState(false);
-  const [isFormValid, setIsFormValid] = useState(true); // Validatsiya holati
   const navigate = useNavigate();
+  const [isFormValid, setIsFormValid] = useState(true); // Validatsiya holati
 
   const validateForm = () => {
     const cardFilled = cardNumber.length === 19;
@@ -26,14 +26,15 @@ const ObunaPay = () => {
         description:
           "Kartangizning amal qilish muddatini to'g'ri kiriting! (MM/YY formatida)",
       });
+      setIsFormValid(false); // Validatsiya muvaffaqiyatli bo'lmasa, holatni yangilang
     } else if (!valid && isFormValid) {
       notification.error({
         message: "Xatolik",
         description: "Karta ma'lumotlarini qayta tekshiring",
       });
+      setIsFormValid(false); // Validatsiya muvaffaqiyatli bo'lmasa, holatni yangilang
     }
 
-    setIsFormValid(!valid); // Validatsiya natijasini saqlash
     return valid;
   };
 
@@ -42,9 +43,9 @@ const ObunaPay = () => {
       window.Telegram.WebApp.MainButton.setText("Tasdiqlash").show();
       window.Telegram.WebApp.MainButton.onClick(() => {
         if (validateForm()) {
-          console.log("Expiry Date:", expiryDate);
-          console.log("Card Number:", cardNumber);
-          handleSubmit();
+          handleSubmit(); // Validatsiya muvaffaqiyatli bo'lsa, submit qilish
+        } else {
+          setIsFormValid(true); // Har bir bosishdan so'ng, isFormValid ni yangilash
         }
       });
     } else {
