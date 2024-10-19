@@ -31,7 +31,7 @@ const ConfirmationCode = () => {
 
     try {
       const response = await fetch(
-        "https://6aa7-2a09-bac5-d34b-505-00-80-c1.ngrok-free.app/api/confirmCardBinding?userId=" +
+        "https://0fdb-84-54-78-192.ngrok-free.app/api/confirmCardBinding?userId=" +
           localStorage.getItem("obunaPay"),
         {
           method: "POST",
