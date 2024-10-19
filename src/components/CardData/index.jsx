@@ -94,46 +94,48 @@ const ObunaPay = () => {
     <div className="container">
       <div className="form-section">
         <h1>Bank kartasi ma&apos;lumotlarini kiriting</h1>
-        <MaskedInput
-          mask={[
-            /\d/,
-            /\d/,
-            /\d/,
-            /\d/,
-            " ",
-            /\d/,
-            /\d/,
-            /\d/,
-            /\d/,
-            " ",
-            /\d/,
-            /\d/,
-            /\d/,
-            /\d/,
-            " ",
-            /\d/,
-            /\d/,
-            /\d/,
-            /\d/,
-          ]}
-          className="card-number"
-          placeholder="0000 0000 0000 0000"
-          value={cardNumber}
-          onChange={(e) => setCardNumber(e.target.value)}
-          required
-        />
-        <MaskedInput
-          mask={[/\d/, /\d/, "/", /\d/, /\d/]}
-          className="card-expiry"
-          placeholder="MM/YY"
-          value={expiryDate}
-          onChange={(e) => setExpiryDate(e.target.value)}
-          required
-        />
-        <p>
-          To&apos;lovlar faqatgina UzCard va Humo kartalari orqali amalga
-          oshiriladi.
-        </p>
+        <form>
+          <MaskedInput
+            mask={[
+              /\d/,
+              /\d/,
+              /\d/,
+              /\d/,
+              " ",
+              /\d/,
+              /\d/,
+              /\d/,
+              /\d/,
+              " ",
+              /\d/,
+              /\d/,
+              /\d/,
+              /\d/,
+              " ",
+              /\d/,
+              /\d/,
+              /\d/,
+              /\d/,
+            ]}
+            className="card-number"
+            placeholder="0000 0000 0000 0000"
+            value={cardNumber}
+            onChange={(e) => setCardNumber(e.target.value)}
+            required
+          />
+          <MaskedInput
+            mask={[/\d/, /\d/, "/", /\d/, /\d/]}
+            className="card-expiry"
+            placeholder="MM/YY"
+            value={expiryDate}
+            onChange={(e) => setExpiryDate(e.target.value)}
+            required
+          />
+          <p>
+            To&apos;lovlar faqatgina UzCard va Humo kartalari orqali amalga
+            oshiriladi.
+          </p>
+        </form>
       </div>
 
       <div className="security-info">
