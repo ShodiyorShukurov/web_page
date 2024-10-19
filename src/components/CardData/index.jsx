@@ -20,7 +20,7 @@ const ObunaPay = () => {
   const validateForm = () => {
     const cardNumber = document
       .querySelector(".card-number")
-      .value.replace(/\s+/g, "");
+      .value.replace(/[^0-9]/g, "");
       console.log(cardNumber);
     const expiryDate = document.querySelector(".card-expiry").value;
 
@@ -53,10 +53,10 @@ const ObunaPay = () => {
 
     const cardNumber = document
       .querySelector(".card-number")
-      .value.replace(/\s+/g, "");
+      .value.replace(/[^0-9]/g, "");
     const expiryDate = document.querySelector(".card-expiry").value;
 
-    console.log(expiryDate);
+    console.log(cardNumber);
     try {
       const response = await fetch(
         "https://b2b0-84-54-78-192.ngrok-free.app/api/initializeCardBinding?userId=" +
