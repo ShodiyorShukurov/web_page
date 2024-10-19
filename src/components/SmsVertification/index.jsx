@@ -1,3 +1,4 @@
+/* global Telegram */
 import { useState } from "react";
 import { notification } from "antd";
 import MaskedInput from "react-text-mask";
@@ -10,9 +11,20 @@ const ConfirmationCode = () => {
   // Function to show the notification
   const openNotificationWithIcon = (type, message) => {
     notification[type]({
-      message: type === "error" ? "Xatolik": "Muvaffaqiyatli",
+      message: type === "error" ? "Xatolik" : "Muvaffaqiyatli",
       description: message,
     });
+  };
+
+  // Function to handle Telegram WebApp button
+  const handleMainButton = (data) => {
+    if (data.user_id !== null) {
+      Telegram.WebApp.MainButton.setText("CLOSE WEBVIEW")
+        .show()
+        .onClick(() => {
+          Telegram.WebApp.close(); 
+        });
+    }
   };
 
   const handleConfirm = async (evt) => {
@@ -45,9 +57,11 @@ const ConfirmationCode = () => {
       );
 
       const data = await response.json();
-      if (data.card_id != null) {
+
+      if (data.card_id != null && data.user_id != null) {
         console.log("Confirmation Successful:", data);
         openNotificationWithIcon("success", "Sizning kartangiz ulandi");
+        handleMainButton(data); // Check and show Telegram WebApp MainButton
       } else {
         openNotificationWithIcon("error", "Boshqa kartani kiriting!");
       }
