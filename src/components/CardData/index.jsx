@@ -43,8 +43,7 @@ const ObunaPay = () => {
     return cardFilled && expiryFilled && expiryValid;
   };
 
-  const handleSubmit = async (evt) => {
-    evt.preventDefault();
+  const handleSubmit = async () => {
     if (loading) return;
 
     if (!validateForm()) {
