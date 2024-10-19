@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import MaskedInput from "react-text-mask";
 import { notification } from "antd";
 import "./ObunaPay.css";
@@ -7,10 +7,6 @@ import { useNavigate, useParams } from "react-router-dom";
 const ObunaPay = () => {
   const { id } = useParams();
   localStorage.setItem("obunaPay", id);
-  const [cardNumber, setCardNumber] = useState("");
-  const [expiryDate, setExpiryDate] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [isFormValid, setIsFormValid] = useState(true); // Validatsiya holati
   const navigate = useNavigate();
 
   const validateCardNumber = (value) => {
@@ -24,7 +20,6 @@ const ObunaPay = () => {
 
 
   const handleSubmit = async (cardNumber, expiryDate) => {
-    setLoading(true);
     const formattedCardNumber = cardNumber.replace(/\s+/g, "");
 
     try {
@@ -61,8 +56,6 @@ const ObunaPay = () => {
         message: "Xatolik",
         description: "Iltimos, boshqa karta kiriting!",
       });
-    } finally {
-      setLoading(false);
     }
   };
 
