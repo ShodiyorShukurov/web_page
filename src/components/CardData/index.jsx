@@ -49,7 +49,7 @@ const ObunaPay = () => {
       );
 
       const data = await response.json();
-
+      
       if (data.phone == null || data.phone == "null") {
         console.log("Error:", data);
         notification.error({
@@ -134,7 +134,7 @@ const ObunaPay = () => {
       </div>
 
       {/* Sticky Button with Loader */}
-      <div className="sticky-button">
+     {/* <div className="sticky-button">*/}
         <button
           type="submit"
           className="confirm-btn"
@@ -143,7 +143,7 @@ const ObunaPay = () => {
         >
           {loading ? <div className="loader"></div> : "Tasdiqlash kodini olish"}
         </button>
-      </div>
+     {/* </div>*/}
     </div>
   );
 };
