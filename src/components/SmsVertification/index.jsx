@@ -7,7 +7,6 @@ const ConfirmationCode = () => {
   const [confirmationCode, setConfirmationCode] = useState("");
   const [loading, setLoading] = useState(false);
 
-
   // Function to show the notification
   const openNotificationWithIcon = (type, message) => {
     notification[type]({
@@ -49,6 +48,7 @@ const ConfirmationCode = () => {
 
       if (data) {
         console.log("Confirmation Successful:", data);
+        window.close();
       }
     } catch (error) {
       console.log(error);
