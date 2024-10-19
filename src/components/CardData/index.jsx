@@ -12,85 +12,97 @@ const ObunaPay = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (window.Telegram && window.Telegram.WebApp) {
-      window.Telegram.WebApp.MainButton.text = "Submit";
-      window.Telegram.WebApp.MainButton.onClick(handleSubmit);
-      window.Telegram.WebApp.MainButton.show();
-    }
-  }, [cardNumber, expiryDate]);
+    const validateForm = () => {
+      const cardFilled = cardNumber.length === 19;
+      const expiryFilled = expiryDate.length === 5;
+      const expiryValid = /^(0[1-9]|1[0-2])\/(\d{2})$/.test(expiryDate);
 
-  const validateForm = () => {
-    const cardFilled = cardNumber.length === 19;
-    const expiryFilled = expiryDate.length === 5;
-    const expiryValid = /^(0[1-9]|1[0-2])\/(\d{2})$/.test(expiryDate);
-
-    if (!expiryValid) {
-      notification.error({
-        message: "Xatolik",
-        description:
-          "Kartangizning amal qilish muddatini to'g'ri kiriting! (MM/YY formatida)",
-      });
-    }
-
-    return cardFilled && expiryFilled && expiryValid;
-  };
-
-  const handleSubmit = async () => {
-    console.log("Expiry Date:", expiryDate);
-    console.log("Card Number:", cardNumber);
-
-    // Formani tasdiqlash
-    if (!validateForm()) {
-      notification.error({
-        message: "Xatolik",
-        description: "Karta ma'lumotlarini qayta tekshiring",
-      });
-      return;
-    }
-    // Xavfsizlik maqsadida shartdan keyin o'rnatildi
-    const formattedCardNumber = cardNumber.replace(/\s+/g, "");
-
-    try {
-      const response = await fetch(
-        "https://b2b0-84-54-78-192.ngrok-free.app/api/initializeCardBinding?userId=" +
-          localStorage.getItem("obunaPay"),
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            card_number: formattedCardNumber,
-            expiry: expiryDate,
-          }),
-        }
-      );
-
-      const data = await response.json();
-
-      if (data.phone == null || data.phone === "null") {
+      if (!expiryValid) {
         notification.error({
           message: "Xatolik",
-          description: "Iltimos, nomerga ulangan kartani kiriting!",
+          description:
+            "Kartangizning amal qilish muddatini to'g'ri kiriting! (MM/YY formatida)",
         });
-      } else {
-        localStorage.setItem("transaction_id", data.transaction_id);
-        localStorage.setItem("phone", data.phone);
-        navigate("/sms-verification");
       }
-    } catch (error) {
-      console.error("Error:", error);
-      notification.error({
-        message: "Xatolik",
-        description: "Iltimos, boshqa karta kiriting!",
-      });
-    }
 
+      return cardFilled && expiryFilled && expiryValid;
+    };
+
+useEffect(() => {
+  if (window.Telegram && window.Telegram.WebApp) {
+    window.Telegram.WebApp.MainButton.setText("Tasdiqlash").show();
+    window.Telegram.WebApp.MainButton.onClick(() => {
+      // Har bir bosish bilan ma'lumotlarni to'plab olish
+      if (validateForm()) {
+        console.log("Expiry Date:", expiryDate);
+        console.log("Card Number:", cardNumber);
+        handleSubmit(); // Formani tasdiqlash uchun chaqiramiz
+      } else {
+        notification.error({
+          message: "Xatolik",
+          description: "Karta ma'lumotlarini qayta tekshiring",
+        });
+      }
+    });
+  } else {
+    console.log("Telegram WebApp SDK yuklanmagan");
+  }
+
+  return () => {
     if (window.Telegram && window.Telegram.WebApp) {
       window.Telegram.WebApp.MainButton.hide();
     }
   };
+}, [cardNumber, expiryDate]);
+
+const handleSubmit = async () => {
+  // Formani tasdiqlash
+  if (!validateForm()) {
+    return; // Agar formani tasdiqlash muvaffaqiyatli bo'lmasa, ortga qaytish
+  }
+
+  setLoading(true);
+  const formattedCardNumber = cardNumber.replace(/\s+/g, "");
+
+  try {
+    const response = await fetch(
+      "https://b2b0-84-54-78-192.ngrok-free.app/api/initializeCardBinding?userId=" +
+        localStorage.getItem("obunaPay"),
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          card_number: formattedCardNumber,
+          expiry: expiryDate,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (data.phone == null || data.phone === "null") {
+      notification.error({
+        message: "Xatolik",
+        description: "Iltimos, nomerga ulangan kartani kiriting!",
+      });
+    } else {
+      localStorage.setItem("transaction_id", data.transaction_id);
+      localStorage.setItem("phone", data.phone);
+      navigate("/sms-verification");
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    notification.error({
+      message: "Xatolik",
+      description: "Iltimos, boshqa karta kiriting!",
+    });
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <div className="container">
