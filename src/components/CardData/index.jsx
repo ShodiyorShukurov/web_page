@@ -10,56 +10,20 @@ const ObunaPay = () => {
   const [cardNumber, setCardNumber] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
   const [isFormValid, setIsFormValid] = useState(true); // Validatsiya holati
+  const navigate = useNavigate();
 
-  const validateForm = () => {
-    const cardFilled = cardNumber.length === 19;
-    const expiryFilled = expiryDate.length === 5;
-    const expiryValid = /^(0[1-9]|1[0-2])\/(\d{2})$/.test(expiryDate);
-
-    const valid = cardFilled && expiryFilled && expiryValid;
-
-    if (!expiryValid && isFormValid) {
-      notification.error({
-        message: "Xatolik",
-        description:
-          "Kartangizning amal qilish muddatini to'g'ri kiriting! (MM/YY formatida)",
-      });
-      setIsFormValid(false); // Validatsiya muvaffaqiyatli bo'lmasa, holatni yangilang
-    } else if (!valid && isFormValid) {
-      notification.error({
-        message: "Xatolik",
-        description: "Karta ma'lumotlarini qayta tekshiring",
-      });
-      setIsFormValid(false); // Validatsiya muvaffaqiyatli bo'lmasa, holatni yangilang
-    }
-
-    return valid;
+  const validateCardNumber = (value) => {
+    return value && value.length === 19;
   };
 
-  useEffect(() => {
-    if (window.Telegram && window.Telegram.WebApp) {
-      window.Telegram.WebApp.MainButton.setText("Tasdiqlash").show();
-      window.Telegram.WebApp.MainButton.onClick(() => {
-        if (validateForm()) {
-          handleSubmit(); // Validatsiya muvaffaqiyatli bo'lsa, submit qilish
-        } else {
-          setIsFormValid(true); // Har bir bosishdan so'ng, isFormValid ni yangilash
-        }
-      });
-    } else {
-      console.log("Telegram WebApp SDK yuklanmagan");
-    }
+  const validateExpiryDate = (value) => {
+    return value && /^(0[1-9]|1[0-2])\/(\d{2})$/.test(value);
+  };
 
-    return () => {
-      if (window.Telegram && window.Telegram.WebApp) {
-        window.Telegram.WebApp.MainButton.hide();
-      }
-    };
-  }, [cardNumber, expiryDate]);
 
-  const handleSubmit = async () => {
+
+  const handleSubmit = async (cardNumber, expiryDate) => {
     setLoading(true);
     const formattedCardNumber = cardNumber.replace(/\s+/g, "");
 
@@ -102,6 +66,46 @@ const ObunaPay = () => {
     }
   };
 
+
+    useEffect(() => {
+      if (window.Telegram && window.Telegram.WebApp) {
+        window.Telegram.WebApp.MainButton.setText("Tasdiqlash").show();
+        window.Telegram.WebApp.MainButton.onClick(() => {
+          const cardNumber = document.querySelector(".card-number").value;
+          const expiryDate = document.querySelector(".card-expiry").value;
+
+          if (
+            validateCardNumber(cardNumber) &&
+            validateExpiryDate(expiryDate)
+          ) {
+            handleSubmit(cardNumber, expiryDate);
+          } else {
+            if (!validateCardNumber(cardNumber)) {
+              notification.error({
+                message: "Xatolik",
+                description: "Karta raqamini to'g'ri kiriting!",
+              });
+            }
+            if (!validateExpiryDate(expiryDate)) {
+              notification.error({
+                message: "Xatolik",
+                description:
+                  "Kartangizning amal qilish muddatini to'g'ri kiriting! (MM/YY formatida)",
+              });
+            }
+          }
+        });
+      } else {
+        console.log("Telegram WebApp SDK yuklanmagan");
+      }
+
+      return () => {
+        if (window.Telegram && window.Telegram.WebApp) {
+          window.Telegram.WebApp.MainButton.hide();
+        }
+      };
+    }, []);
+
   return (
     <div className="container">
       <div className="form-section">
@@ -131,16 +135,13 @@ const ObunaPay = () => {
             ]}
             className="card-number"
             placeholder="0000 0000 0000 0000"
-            value={cardNumber}
-            onChange={(e) => setCardNumber(e.target.value)}
             required
           />
           <MaskedInput
+            id="card-number"
             mask={[/\d/, /\d/, "/", /\d/, /\d/]}
             className="card-expiry"
             placeholder="MM/YY"
-            value={expiryDate}
-            onChange={(e) => setExpiryDate(e.target.value)}
             required
           />
           <p>
