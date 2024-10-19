@@ -25,7 +25,7 @@ const ObunaPay = () => {
         window.Telegram.WebApp.MainButton.hide();
       }
     };
-  }, []);
+  }, [expiryDate, cardNumber]);
 
 
   const validateForm = () => {
