@@ -10,7 +10,7 @@ const ConfirmationCode = () => {
   // Function to show the notification
   const openNotificationWithIcon = (type, message) => {
     notification[type]({
-      message: "Xatolik",
+      message: type === "error" ? "Xatolik": "Muvaffaqiyatli",
       description: message,
     });
   };
@@ -45,10 +45,11 @@ const ConfirmationCode = () => {
       );
 
       const data = await response.json();
-
-      if (data) {
+      if (data.card_id != null) {
         console.log("Confirmation Successful:", data);
-        window.close();
+        openNotificationWithIcon("success", "Sizning kartangiz ulandi");
+      } else {
+        openNotificationWithIcon("error", "Boshqa kartani kiriting!");
       }
     } catch (error) {
       console.log(error);
