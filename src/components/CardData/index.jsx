@@ -21,6 +21,7 @@ const ObunaPay = () => {
     const cardNumber = document
       .querySelector(".card-number")
       .value.replace(/\s+/g, "");
+      console.log(cardNumber);
     const expiryDate = document.querySelector(".card-expiry").value;
 
     const cardValid = validateCardNumber(cardNumber);
