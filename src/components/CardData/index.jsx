@@ -14,19 +14,11 @@ const ObunaPay = () => {
 
   useEffect(() => {
     if (window.Telegram && window.Telegram.WebApp) {
-      window.Telegram.WebApp.MainButton.setText("Tasdiqlash").show();
+      window.Telegram.WebApp.MainButton.text = "Submit";
       window.Telegram.WebApp.MainButton.onClick(handleSubmit);
-    } else {
-      console.log("Telegram WebApp SDK yuklanmagan");
+      window.Telegram.WebApp.MainButton.show();
     }
-
-    return () => {
-      if (window.Telegram && window.Telegram.WebApp) {
-        window.Telegram.WebApp.MainButton.hide();
-      }
-    };
-  }, [expiryDate, cardNumber]);
-
+  }, [cardNumber, expiryDate]);
 
   const validateForm = () => {
     const cardFilled = cardNumber.length === 19;
@@ -44,61 +36,61 @@ const ObunaPay = () => {
     return cardFilled && expiryFilled && expiryValid;
   };
 
-const handleSubmit = async () => {
-  console.log("Expiry Date:", expiryDate);
-  console.log("Card Number:", cardNumber);
+  const handleSubmit = async () => {
+    console.log("Expiry Date:", expiryDate);
+    console.log("Card Number:", cardNumber);
 
-  // Formani tasdiqlash
-  if (!validateForm()) {
-    notification.error({
-      message: "Xatolik",
-      description: "Karta ma'lumotlarini qayta tekshiring",
-    });
-    return;
-  }
-
-  setLoading(true); // Xavfsizlik maqsadida shartdan keyin o'rnatildi
-  const formattedCardNumber = cardNumber.replace(/\s+/g, "");
-
-  try {
-    const response = await fetch(
-      "https://b2b0-84-54-78-192.ngrok-free.app/api/initializeCardBinding?userId=" +
-        localStorage.getItem("obunaPay"),
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          card_number: formattedCardNumber,
-          expiry: expiryDate,
-        }),
-      }
-    );
-
-    const data = await response.json();
-
-    if (data.phone == null || data.phone === "null") {
+    // Formani tasdiqlash
+    if (!validateForm()) {
       notification.error({
         message: "Xatolik",
-        description: "Iltimos, nomerga ulangan kartani kiriting!",
+        description: "Karta ma'lumotlarini qayta tekshiring",
       });
-    } else {
-      localStorage.setItem("transaction_id", data.transaction_id);
-      localStorage.setItem("phone", data.phone);
-      navigate("/sms-verification");
+      return;
     }
-  } catch (error) {
-    console.error("Error:", error);
-    notification.error({
-      message: "Xatolik",
-      description: "Iltimos, boshqa karta kiriting!",
-    });
-  } finally {
-    setLoading(false);
-  }
-};
+    // Xavfsizlik maqsadida shartdan keyin o'rnatildi
+    const formattedCardNumber = cardNumber.replace(/\s+/g, "");
 
+    try {
+      const response = await fetch(
+        "https://b2b0-84-54-78-192.ngrok-free.app/api/initializeCardBinding?userId=" +
+          localStorage.getItem("obunaPay"),
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            card_number: formattedCardNumber,
+            expiry: expiryDate,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.phone == null || data.phone === "null") {
+        notification.error({
+          message: "Xatolik",
+          description: "Iltimos, nomerga ulangan kartani kiriting!",
+        });
+      } else {
+        localStorage.setItem("transaction_id", data.transaction_id);
+        localStorage.setItem("phone", data.phone);
+        navigate("/sms-verification");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      notification.error({
+        message: "Xatolik",
+        description: "Iltimos, boshqa karta kiriting!",
+      });
+    }
+
+    if (window.Telegram && window.Telegram.WebApp) {
+      window.Telegram.WebApp.MainButton.hide();
+    }
+  };
 
   return (
     <div className="container">
