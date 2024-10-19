@@ -13,7 +13,7 @@ const ObunaPay = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (window.Telegram) {
+    if (window.Telegram && window.Telegram.WebApp) {
       window.Telegram.WebApp.MainButton.setText("Tasdiqlash").show();
       window.Telegram.WebApp.MainButton.onClick(handleSubmit);
     } else {
@@ -21,11 +21,12 @@ const ObunaPay = () => {
     }
 
     return () => {
-      if (window.Telegram) {
+      if (window.Telegram && window.Telegram.WebApp) {
         window.Telegram.WebApp.MainButton.hide();
       }
     };
   }, []);
+
 
   const validateForm = () => {
     const cardFilled = cardNumber.length === 19;
@@ -44,8 +45,9 @@ const ObunaPay = () => {
   };
 
   const handleSubmit = async () => {
-    if (loading) return;
+    // if (loading) return;
 
+    console.log("Loading")
     if (!validateForm()) {
       notification.error({
         message: "Xatolik",
