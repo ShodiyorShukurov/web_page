@@ -33,7 +33,14 @@ const ObunaPay = () => {
   const validateForm = () => {
     const cardFilled = cardNumber.length === 19;
     const expiryFilled = expiryDate.length === 5;
-    return cardFilled && expiryFilled;
+    const expiryValid = /^(0[1-9]|1[0-2])\/(\d{2})$/.test(expiryDate); // Bu regex orqali MM/YY formatini tekshirish
+    if (!expiryValid) {
+      notification.error({
+        message: "Xatolik",
+        description: "Kartangizning amal qilish muddatini to'g'ri kiriting!",
+      });
+    }
+    return cardFilled && expiryFilled && expiryValid;
   };
 
   const handleSubmit = async () => {
