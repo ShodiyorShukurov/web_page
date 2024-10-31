@@ -45,8 +45,8 @@ const ObunaPay = () => {
     return cardValid && expiryValid;
   };
 
-  const handleSubmit = async (evt) => {
-    evt.preventDefault();
+  const handleSubmit = async () => {
+
     if (!validateForm()) {
       return;
     }
@@ -56,7 +56,7 @@ const ObunaPay = () => {
       .value.replace(/[^0-9]/g, "");
     const expiryDate = document.querySelector(".card-expiry").value;
 
-    console.log(cardNumber, expiryDate);
+
     try {
       const response = await fetch(
         "https://bot.admob.uz/api/v1/add-card/" +
@@ -75,17 +75,20 @@ const ObunaPay = () => {
 
       const data = await response.json();
 
-      console.log(data)
       if (data.status == 400) {
         notification.error({
           message: "Xatolik",
           description: "Iltimos, nomerga ulangan kartani kiriting!",
         });
-      } 
-      else {
+      } else if (data.status == 200) {
         localStorage.setItem("transaction_id", data.transaction_id);
         localStorage.setItem("phone", data.phone);
         navigate("/sms-verification");
+      } else if (data.description == "У партнера имеется указанная карта") {
+        notification.error({
+          message: "Xatolik",
+          description: "Bu karta oldin qo'shilgan boshqa karta kiriting!",
+        });
       }
     } catch (error) {
       console.error("Error:", error);
@@ -166,7 +169,6 @@ const ObunaPay = () => {
           Obuna xizmati sizning shaxsingizga oid hech qanday ma&apos;lumot
           saqlamaydi.
         </p>
-        <button onClick={handleSubmit}>yuborish</button>
       </div>
     </div>
   );

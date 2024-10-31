@@ -12,13 +12,8 @@ const ConfirmationCode = () => {
   };
 
   // Tasdiqlash funksiyasi
-  const handleConfirm = async (evt) => {
-
-    evt.preventDefault();
-    const code = document.getElementById("code").value;
-
-
-    console.log(code)
+  const handleConfirm = async (code) => {
+ 
     try {
       const response = await fetch(
         "https://bot.admob.uz/api/v1/opt/" + localStorage.getItem("obunaPay"),
@@ -28,14 +23,15 @@ const ConfirmationCode = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            otp: code,
+            code: code,
             transaction_id: localStorage.getItem("transaction_id"),
           }),
         }
       );
 
       const data = await response.json();
-      if (data.card_id != null) {
+ 
+      if (data.status == 200) {
         window.Telegram.WebApp.close();
       } else {
         openNotificationWithIcon("error", "Boshqa kartani kiriting!");
@@ -53,35 +49,35 @@ const ConfirmationCode = () => {
     return code && code.length === 6;
   };
 
-  // useEffect(() => {
-  //   if (window.Telegram) {
-  //     window.Telegram.WebApp.MainButton.setText("Tasdiqlash").show();
+  useEffect(() => {
+    if (window.Telegram) {
+      window.Telegram.WebApp.MainButton.setText("Tasdiqlash").show();
 
-  //     window.Telegram.WebApp.MainButton.onClick(() => {
-  //       const code = document.getElementById("code").value;
-  //       if (validateCode(code)) {
-  //         handleConfirm(code);
-  //       } else if (!validateCode(code)) {
-  //         notification.error({
-  //           message: "Xatolik",
-  //           description:
-  //             "Iltimos telefon raqamingizga borgan 6 xonali kodni kiriting!",
-  //         });
-  //       }
-  //     });
-  //     return () => {
-  //       if (window.Telegram && window.Telegram.WebApp) {
-  //         window.Telegram.WebApp.MainButton.hide();
-  //       }
-  //     };
-  //   }
-  // }, []);
+      window.Telegram.WebApp.MainButton.onClick(() => {
+        const code = document.getElementById("code").value;
+        if (validateCode(code)) {
+          handleConfirm(code);
+        } else if (!validateCode(code)) {
+          notification.error({
+            message: "Xatolik",
+            description:
+              "Iltimos telefon raqamingizga borgan 6 xonali kodni kiriting!",
+          });
+        }
+      });
+      return () => {
+        if (window.Telegram && window.Telegram.WebApp) {
+          window.Telegram.WebApp.MainButton.hide();
+        }
+      };
+    }
+  }, []);
 
   return (
     <div className="container">
       <h1 style={{ marginBottom: "20px", fontSize: "18px" }}>
-        {localStorage.getItem("phone")}{" "}
-        raqamiga yuborilgan tasdiqlash kodini kiriting
+        {localStorage.getItem("phone")} raqamiga yuborilgan tasdiqlash kodini
+        kiriting
       </h1>
       <form>
         <MaskedInput
@@ -90,7 +86,6 @@ const ConfirmationCode = () => {
           placeholder="000000"
         />
       </form>
-      <button onClick={handleConfirm}>tasdiqlash</button>
     </div>
   );
 };
