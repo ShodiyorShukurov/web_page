@@ -45,7 +45,8 @@ const ObunaPay = () => {
     return cardValid && expiryValid;
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (evt) => {
+    evt.preventDefault();
     if (!validateForm()) {
       return;
     }
@@ -55,9 +56,10 @@ const ObunaPay = () => {
       .value.replace(/[^0-9]/g, "");
     const expiryDate = document.querySelector(".card-expiry").value;
 
+    console.log(cardNumber, expiryDate);
     try {
       const response = await fetch(
-        "https://b2b0-84-54-78-192.ngrok-free.app/api/initializeCardBinding?userId=" +
+        "https://bot.admob.uz/api/v1/add-card/" +
           localStorage.getItem("obunaPay"),
         {
           method: "POST",
@@ -72,21 +74,15 @@ const ObunaPay = () => {
       );
 
       const data = await response.json();
-      if (
-        !(data.errorCode == null || data.errorCode === "null") &&
-        !(data.errorMessage == null || data.errorMessage === "null")
-      ) {
-        notification.error({
-          message: "Xatolik",
-          description: data.errorMessage,
-        });
-      }
-      if (data.phone == null || data.phone === "null") {
+
+      console.log(data)
+      if (data.status == 400) {
         notification.error({
           message: "Xatolik",
           description: "Iltimos, nomerga ulangan kartani kiriting!",
         });
-      } else {
+      } 
+      else {
         localStorage.setItem("transaction_id", data.transaction_id);
         localStorage.setItem("phone", data.phone);
         navigate("/sms-verification");
@@ -102,9 +98,9 @@ const ObunaPay = () => {
 
   useEffect(() => {
     if (window.Telegram && window.Telegram.WebApp) {
-      window.Telegram.WebApp.MainButton.setText("Tasdiqlash").show();
+      window.Telegram.WebApp.MainButton.setText("Tasdiqlash").show().setAtribut;
       window.Telegram.WebApp.MainButton.onClick(() => {
-        handleSubmit(); // Faqatgina handleSubmit ni chaqiramiz, validatsiya ichida amalga oshiriladi
+        handleSubmit();
       });
     } else {
       console.log("Telegram WebApp SDK yuklanmagan");
@@ -170,6 +166,7 @@ const ObunaPay = () => {
           Obuna xizmati sizning shaxsingizga oid hech qanday ma&apos;lumot
           saqlamaydi.
         </p>
+        <button onClick={handleSubmit}>yuborish</button>
       </div>
     </div>
   );
